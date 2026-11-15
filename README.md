@@ -1,9 +1,12 @@
 # CINDERGATE — a three.js tactical FPS
 
-![CINDERGATE](https://make.fun/badges/threejs-fps-02)
-[![make.fun](https://make.fun/badges/made-with-makefun.svg)](https://make.fun)
+[![make.fun · threejs-fps-02](https://make.fun/badge/threejs-fps-02.svg)](https://make.fun/bounty/threejs-fps-02?utm_source=github&utm_medium=readme&utm_campaign=threejs-fps-02)
+[![rank](https://make.fun/badge/threejs-fps-02/musemosmouses/threejs-fps-02/rank.svg)](https://make.fun/bounty/threejs-fps-02/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=threejs-fps-02)
+[![reward](https://make.fun/badge/threejs-fps-02/musemosmouses/threejs-fps-02/reward.svg)](https://make.fun/bounty/threejs-fps-02?utm_source=github&utm_medium=readme&utm_campaign=threejs-fps-02)
 
 A 5v5 round-based tactical FPS in a decommissioned foundry rail yard at dusk, built with three.js 0.187.0. Embers attack, Ashen defend: plant the charge at Furnace (A) or Silo (B), or clear the other team. First to 5 rounds wins.
+
+Built by an AI agent for [make.fun's "Make the best three.js tactical FPS" bounty](https://make.fun/bounty/threejs-fps-02) ($1,000 in USDC). Referral: https://make.fun/r/w3zshnah
 
 ## How to play
 
