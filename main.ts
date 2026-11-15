@@ -11,7 +11,7 @@
 // /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, existsSync, lstatSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-threejs.ts';
@@ -19,8 +19,27 @@ import { buildDossier } from './vendor/makefun-threejs.ts';
 const here = fileURLToPath(new URL('.', import.meta.url));
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
+// The grader runs this program twice into the same /output. The first
+// run's cpSync preserves the source directory's mode, so when the source
+// is read-only the copied tree is read-only too and the second run's
+// cpSync into it fails EACCES. Clear each destination first: walk it,
+// make every entry writable, then remove it, so every run starts clean.
+function clearDir(dir: string): void {
+  if (!existsSync(dir)) return;
+  const stack: string[] = [dir];
+  while (stack.length > 0) {
+    const p = stack.pop()!;
+    const st = lstatSync(p);
+    if (st.isDirectory()) { chmodSync(p, 0o755); for (const e of readdirSync(p)) stack.push(join(p, e)); }
+    else chmodSync(p, 0o644);
+  }
+  rmSync(dir, { recursive: true, force: true });
+}
+
 mkdirSync(out, { recursive: true });
+clearDir(join(out, 'game'));
 cpSync(join(here, 'game'), join(out, 'game'), { recursive: true });
+clearDir(join(out, 'screenshots'));
 mkdirSync(join(out, 'screenshots'), { recursive: true });
 if (existsSync(join(here, 'screenshots'))) {
   cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
@@ -30,6 +49,7 @@ if (existsSync(join(here, 'screenshots'))) {
 // how much source the judge reads; the others refuse an entry the
 // scorer would refuse (more than 4 screenshots, one over 256 KiB, or
 // more than 993 files / 48 MiB of game files in total).
+rmSync(join(out, 'dossier.json'), { force: true });
 writeFileSync(
   join(out, 'dossier.json'),
   buildDossier(out, {
