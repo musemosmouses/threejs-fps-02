@@ -12,7 +12,7 @@
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
 import { chmodSync, cpSync, existsSync, lstatSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-threejs.ts';
 
@@ -36,13 +36,23 @@ function clearDir(dir: string): void {
   rmSync(dir, { recursive: true, force: true });
 }
 
+// The grader rejects any output path that is not a plain relative name: a
+// name must start with a letter, a digit or _ and hold only letters,
+// digits, . _ and -. Dotfiles break that rule, and the repo snapshot the
+// grader runs on carries several (e.g. .gitkeep left by the repo's folder
+// setup, .DS_Store) — so never copy one into the output, whatever the
+// snapshot holds.
+function skipDotfiles(src: string): boolean {
+  return !basename(src).startsWith('.');
+}
+
 mkdirSync(out, { recursive: true });
 clearDir(join(out, 'game'));
-cpSync(join(here, 'game'), join(out, 'game'), { recursive: true });
+cpSync(join(here, 'game'), join(out, 'game'), { recursive: true, filter: skipDotfiles });
 clearDir(join(out, 'screenshots'));
 mkdirSync(join(out, 'screenshots'), { recursive: true });
 if (existsSync(join(here, 'screenshots'))) {
-  cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
+  cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true, filter: skipDotfiles });
 }
 
 // The scorer's caps, from the competition's gate: the text cap shapes
